@@ -11,7 +11,7 @@ pod 'GooglePlaces'
 pod 'GooglePlacePicker'
 pod 'GoogleMaps'
 pod 'CryptoSwift'
-
+pod 'RealmSwift'
 
 
 
