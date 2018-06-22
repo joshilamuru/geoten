@@ -9,6 +9,7 @@
 import UIKit
 import GoogleMaps
 import GooglePlaces
+import RealmSwift
 
 
 class AddPlaceViewController: UIViewController, UserLocationDelegate,
@@ -17,8 +18,15 @@ class AddPlaceViewController: UIViewController, UserLocationDelegate,
     
     @IBOutlet weak var newPlacMapView: GMSMapView!
     
+    @IBOutlet weak var placeTextField: UITextField!
     @IBOutlet weak var imageMarker: UIImageView!
     var currentLocation = CLLocation()
+    var marker = GMSMarker()
+    let realm = try! Realm()
+    
+    
+    let newPlace = POI()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         /* let imageMarker = UIImageView(frame: CGRect(x: self.view.frame.width/2-25, y: self.view.frame.height/2-25, width: 50, height: 50))
@@ -41,7 +49,7 @@ class AddPlaceViewController: UIViewController, UserLocationDelegate,
         let gmsCircle = GMSCircle(position: currentLocation.coordinate, radius: 100)
         let update = GMSCameraUpdate.fit(gmsCircle.bounds())
         newPlacMapView.animate(with: update)
-        let marker = GMSMarker()
+        
         marker.position = currentLocation.coordinate
         marker.isDraggable = true
         marker.map = self.newPlacMapView
@@ -49,6 +57,21 @@ class AddPlaceViewController: UIViewController, UserLocationDelegate,
         
         
     }
+    
+    
+    @IBAction func addPlacePressed(_ sender: Any) {
+        newPlace.address = placeTextField.text!
+        newPlace.latitude = marker.position.latitude
+        newPlace.longitude = marker.position.longitude
+        do{
+            try realm.write{
+                realm.add(newPlace)
+            }
+        }catch{
+            print("Error adding place to realm \(error)")
+        }
+    }
+    
     func mapView(_ mapView: GMSMapView, didBeginDragging marker: GMSMarker) {
         marker.icon = GMSMarker.markerImage(with: .red)
         

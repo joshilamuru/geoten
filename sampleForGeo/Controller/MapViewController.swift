@@ -104,7 +104,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
     func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
         searchBar.resignFirstResponder()
     }
-    @IBAction func addPlacePressed(_ sender: Any) {
+    @IBAction func addNewPlacePressed(_ sender: Any) {
         delegate?.locationData(location: currentLocation)
         performSegue(withIdentifier: "addPlaceSegue", sender: self)
     }

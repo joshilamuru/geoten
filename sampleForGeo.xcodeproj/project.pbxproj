@@ -18,6 +18,7 @@
 		CB5D7B2820D526B80042EE03 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5D7B2720D526B80042EE03 /* Constants.swift */; };
 		CB69E1BD20D68DA300AF7430 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB69E1BC20D68DA300AF7430 /* LoginViewController.swift */; };
 		CBC84E0F20D17B83005D6A82 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC84E0E20D17B83005D6A82 /* MapViewController.swift */; };
+		CBF70AE120DD12CC002E69D5 /* POI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF70AE020DD12CC002E69D5 /* POI.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -35,6 +36,7 @@
 		CB5D7B2720D526B80042EE03 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		CB69E1BC20D68DA300AF7430 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
 		CBC84E0E20D17B83005D6A82 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
+		CBF70AE020DD12CC002E69D5 /* POI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = POI.swift; sourceTree = "<group>"; };
 		D05F9909EEEEB78515C60752 /* Pods-sampleForGeo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-sampleForGeo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-sampleForGeo/Pods-sampleForGeo.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -104,6 +106,7 @@
 		CB69E1BA20D68C0000AF7430 /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				CBF70AE020DD12CC002E69D5 /* POI.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -284,6 +287,7 @@
 				CB69E1BD20D68DA300AF7430 /* LoginViewController.swift in Sources */,
 				CB1BDA7920DB76CB001FB883 /* GMSCircle+Bounds.swift in Sources */,
 				CB5D7B2820D526B80042EE03 /* Constants.swift in Sources */,
+				CBF70AE120DD12CC002E69D5 /* POI.swift in Sources */,
 				CB55BF7C20D0E5DA0084375D /* AppDelegate.swift in Sources */,
 				CB55BF8420D0E5DB0084375D /* sampleForGeo.xcdatamodeld in Sources */,
 				CBC84E0F20D17B83005D6A82 /* MapViewController.swift in Sources */,
