@@ -10,6 +10,7 @@ import UIKit
 import CryptoSwift
 import Alamofire
 import SwiftyJSON
+import SVProgressHUD
 
 class LoginViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var userTextfield: UITextField!
@@ -21,39 +22,67 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        //adding background image to view
-        // let backgroundImage = UIImageView(frame: UIScreen.main.bounds)
-        //  backgroundImage.image = UIImage(named: "bkgimage.jpg")
-        //  backgroundImage.contentMode = UIViewContentMode.scaleAspectFill
-        //self.view.insertSubview(backgroundImage, at: 0)
         self.userTextfield.delegate = self
         self.passwordTextfield.delegate = self
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChange(notification:)), name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChange(notification:)), name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillChange(notification:)), name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
         setupView()
         //getting values in textviews
         
+    
         
-        
+    }
+    
+    deinit {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillShow, object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillHide, object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIKeyboardWillChangeFrame, object: nil)
+    }
+    
+    @objc func keyboardWillChange(notification: Notification){
+        guard let keyboardRect = (notification.userInfo?[UIKeyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {
+            return
+        }
+        if notification.name == NSNotification.Name.UIKeyboardWillShow ||
+        notification.name == NSNotification.Name.UIKeyboardWillChangeFrame {
+            view.frame.origin.y = -keyboardRect.height
+        }else {
+        view.frame.origin.y = 0
+        }
     }
     fileprivate func setupView() {
         userValidationLabel.isHidden = true
-        // Configure Password Validation Label
         passwordValidationLabel.isHidden = true
     }
-    
-    
+    func hideKeyboard(){
+        userTextfield.resignFirstResponder()
+        passwordTextfield.resignFirstResponder()
+    }
+    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+        hideKeyboard()
+        return true
+    }
+  
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
     @IBAction func logInPressed(_ sender: Any) {
+        SVProgressHUD.show()
         if((validate(userTextfield).0) && (validate(passwordTextfield).0)){
             print("both are valid")
             if(authenticateUser(username: userTextfield.text!, password: passwordTextfield.text!)) {
+                SVProgressHUD.dismiss()
                 self.performSegue(withIdentifier: "loginPressedSegue", sender: self)
             }
         }else
         {
+            UIView.animate(withDuration: 0.25, animations: {
+                self.passwordValidationLabel.isHidden = false
+            })
+            self.passwordValidationLabel.text = "Check your email and password"
             print("Input not correct")
             
         }
@@ -110,30 +139,15 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
      
      return digestData
      }*/
+  
     
-    
-    
-    
-    
-    fileprivate func validate(_ textField: UITextField) ->(Bool, String?) {
-        
-        guard let text = textField.text else {
-            return (false, nil)
-        }
-        if(textField == userTextfield) {
-            if(!isValidEmail(textField.text!)){
-                return (false, "Invalid email" )
-            }
-        }
-        return (text.count > 0, "This field cannot be empty.")
-    }
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        switch textField {
+    @IBAction func userEditingDidChange(_ sender: UITextField) {
+        userValidationLabel.isHidden = true
+        passwordValidationLabel.isHidden = true
+        switch sender {
+            
         case userTextfield:
-            
-            
-            let (validuser, messageuser) = validate(textField)
+            let (validuser, messageuser) = validate(userTextfield)
             
             if(validuser){
                 passwordTextfield.becomeFirstResponder()
@@ -149,7 +163,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             
         case passwordTextfield:
             // Validate Text Field
-            let (valid, message) = validate(textField)
+            let (valid, message) = validate(passwordTextfield)
             if(valid){
                 passwordTextfield.resignFirstResponder()
             }
@@ -161,10 +175,24 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                 self.passwordValidationLabel.isHidden = valid
             })
         default:
-            passwordTextfield.resignFirstResponder()
+         //   passwordTextfield.resignFirstResponder()
+            userTextfield.becomeFirstResponder()
         }
         
-        return true
+    }
+    
+    
+    fileprivate func validate(_ textField: UITextField) ->(Bool, String?) {
+        
+        guard let text = textField.text else {
+            return (false, nil)
+        }
+        if(textField == userTextfield) {
+            if(!isValidEmail(textField.text!)){
+                return (false, "Invalid email" )
+            }
+        }
+        return (text.count > 0, "This field cannot be empty.")
     }
     
     func isValidEmail(_ emailField: String) -> Bool {

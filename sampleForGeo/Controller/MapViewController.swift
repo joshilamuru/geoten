@@ -10,7 +10,7 @@ import UIKit
 import GoogleMaps
 import GooglePlaces
 import CoreLocation
-
+import RealmSwift
 
 
 
@@ -31,83 +31,102 @@ class PointOfInterest: NSObject {
         self.longitude = longitude
     }
 }
-protocol UserLocationDelegate {
-    func locationData(location: CLLocation)
-}
-class MapViewController: UIViewController, CLLocationManagerDelegate {
-    
+
+class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchResultsUpdating {
+   
     @IBOutlet weak var pointOfInterestTableView: UITableView!
     @IBOutlet weak var mapView: GMSMapView!
+
+    @IBOutlet weak var chkInButton: UIButton!
     
-    @IBOutlet weak var searchBar: UISearchBar!
-    // MARK: Declare variables
-   // var poi = [PointOfInterest]()
-    var delegate : UserLocationDelegate?
-    let searchController = UISearchController(searchResultsController: nil)
+   // MARK: Declare variables
     let locationManager = CLLocationManager()
     var currentLocation = CLLocation()
-  
-    var selectedIndexPath : IndexPath?
-    var poi = [
-      
-        PointOfInterest(address: "address 4",latitude: 13.084413, longitude: 80.241083),
-        PointOfInterest(address: "address 3", latitude: 13.083807, longitude: 80.239216),
-        PointOfInterest(address: "address 2", latitude: 13.086044, longitude: 80.252087),
-        PointOfInterest(address: "address 1", latitude: 13.088406, longitude:  80.241830),
-        PointOfInterest(address: "address 5",latitude: 13.084413, longitude: 80.241083),
-        PointOfInterest(address: "address 6", latitude: 13.083807, longitude: 80.239216),
-        PointOfInterest(address: "address 7", latitude: 13.086044, longitude: 80.252087),
-        PointOfInterest(address: "address 8", latitude: 13.088406, longitude:  80.241830), PointOfInterest(address: "address 4",latitude: 13.084413, longitude: 80.241083),
-        PointOfInterest(address: "address 9", latitude: 13.083807, longitude: 80.239216),
-        PointOfInterest(address: "address 10", latitude: 13.086044, longitude: 80.252087),
-        PointOfInterest(address: "address 11", latitude: 13.088406, longitude:  80.241830), PointOfInterest(address: "address 4",latitude: 13.084413, longitude: 80.241083),
-        PointOfInterest(address: "address 12", latitude: 13.083807, longitude: 80.239216),
-        PointOfInterest(address: "address 13", latitude: 13.086044, longitude: 80.252087),
-        PointOfInterest(address: "address 14", latitude: 13.088406, longitude:  80.241830)]
-   /* var savedLocations = [["latitude": 14.2789631, "longitude": -90.299759],
-                          ["latitude": 14.798016, "longitude": -89.544779],
-                          ["latitude": 14.4039326, "longitude": -90.699493],
-                          ["latitude": 14.4044418, "longitude": -90.698166],
-                          ["latitude": 14.5640697, "longitude": -89.350716],
-                          ["latitude": 14.2774296, "longitude": -90.298431]]*/
+    var nearHundred = [PointOfInterest]()
+    var filteredNearHundred = [PointOfInterest]()
+    var selectedIndex : Int!
     var placesClient : GMSPlacesClient!
     var selectedPlace : GMSPlace?
-    var sortedPoi : [PointOfInterest] = []
-    
+    var searchController: UISearchController!
+    let realm = try! Realm()
+   
     override func viewDidLoad() {
+        
         super.viewDidLoad()
-        
-        //setup search controller
-        
-        
+        initLocationManager()
         pointOfInterestTableView.delegate = self
         pointOfInterestTableView.dataSource = self
+        //mapView.delegate = self
+        
+        //Initializing searchResultsController to nil meaning searchController will use this view controller
+        //to display the results
+        searchController = UISearchController(searchResultsController: nil)
+        searchController.searchResultsUpdater = self
+        
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.searchBar.sizeToFit()
+        
+        
+        pointOfInterestTableView.tableHeaderView = searchController.searchBar
+        
+        //sets this view controller as presenting view controller for search interface
+        definesPresentationContext = true
+        searchController.hidesNavigationBarDuringPresentation = false
+        //self.extendedLayoutIncludesOpaqueBars = true
+    }
+    
+    func initLocationManager() {
         //Setup location manager
         locationManager.delegate = self
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
+    }
+    
+    func loadPOI(){
         
-        //mapView.delegate = self
+        let savedPlaces = Array(realm.objects(POI.self))
+        nearHundred.removeAll()
+        for place in savedPlaces {
+            if(calcDistanceFromUser(place: place) <= 100.0) {
+                let nearHundredPlace = PointOfInterest(address: place.address, latitude: place.latitude, longitude: place.longitude )
+                nearHundred.append(nearHundredPlace)
+                
+            }
+            
+        }
+        sortNearHundredByDistance()
+        filteredNearHundred = nearHundred
+        selectedIndex = nil
+        self.pointOfInterestTableView.reloadData()
+       
+    }
+    
+    func sortNearHundredByDistance() {
+       nearHundred.sort(by: {$0.distanceFromUser(userLoc: currentLocation) < $1.distanceFromUser(userLoc: currentLocation)})
+    
+    }
+    
+    func calcDistanceFromUser(place: POI) -> Double {
+        //returns distance in meters
+        let loc = CLLocation(latitude: place.latitude, longitude: place.longitude)
+        let dist =  currentLocation.distance(from: loc)
         
-        //load pointsOfInterest from realm database
-        
+        return dist
     }
     
     override func viewWillAppear(_ animated: Bool) {
         navigationItem.title = "Nearby Places"
+        
+        loadPOI()
       
     }
-    
  
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        searchBar.resignFirstResponder()
-    }
+  
     @IBAction func addNewPlacePressed(_ sender: Any) {
-        delegate?.locationData(location: currentLocation)
         performSegue(withIdentifier: "addPlaceSegue", sender: self)
     }
+    
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if(segue.identifier == "addPlaceSegue") {
@@ -116,19 +135,22 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
             
             navigationItem.title = " "
             destinationVC.navigationItem.title = "Add A New Place"
+        }else if (segue.identifier == "chkInSegue") {
+            let destinationVC = segue.destination as! CheckInController
+            navigationItem.title = ""
+          
+            if(selectedIndex != nil){
+            destinationVC.acct = filteredNearHundred[selectedIndex].address
+            }else
+            {
+                print("no row selected in tableview")
+                //alert user to select 
+            }
+        //    destinationVC.navigationItem.title = "Check-In \n \(filteredNearHundred[selectedIndex].address)"
         }
     }
     
-    // MARK : Sort poi based on distance from user location
-    func sortPoiByDistance() {
-        
-          sortedPoi = poi.sorted(by: {$0.distanceFromUser(userLoc: currentLocation) < $1.distanceFromUser(userLoc: currentLocation)})
-            for poi in sortedPoi{
-            print(poi.address)
-        }
-        poi = sortedPoi
-    }
- 
+    
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -139,11 +161,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
         currentLocation = locations[locations.count-1] //getting the last updated location which is most accurate
         if currentLocation.horizontalAccuracy > 0 {
             locationManager.stopUpdatingLocation()
-            
-            //sort Point of Interest locations and reload tableview
-            sortPoiByDistance()
-            self.pointOfInterestTableView.reloadData()
-            
+           
+            loadPOI()
+        
             print("longitude = \(currentLocation.coordinate.longitude), latitude = \(currentLocation.coordinate.latitude)")
             
             let camera = GMSCameraPosition.camera(withLatitude: currentLocation.coordinate.latitude,longitude: currentLocation.coordinate.longitude, zoom: 16)
@@ -153,25 +173,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
             let gmsCircle = GMSCircle(position: currentLocation.coordinate, radius: 100)
             let update = GMSCameraUpdate.fit(gmsCircle.bounds())
             mapView.animate(with: update)
-            
-           
-
-            
-            //To display all the locations markers and bound to them
-        /*   mapView.clear()
-            var bounds = GMSCoordinateBounds()
-           for point in poi{
-                let marker = GMSMarker()
-                marker.position = CLLocationCoordinate2D(latitude: point.latitude, longitude: point.longitude)
-                print(marker.position.latitude, marker.position.longitude)
-                bounds = bounds.includingCoordinate(marker.position)
-                marker.map = self.mapView
-                var update = GMSCameraUpdate.fit(bounds, withPadding: 20)
-                mapView.moveCamera(update)
-            }
-            */
         
-            
         }
     }
     //didFailWithError method
@@ -180,6 +182,20 @@ class MapViewController: UIViewController, CLLocationManagerDelegate {
         //locationDetailLabel.text = "Location Unavailable"
     }
 
+    
+    @IBAction func chkInBtnPressed(_ sender: Any) {
+      
+        if(selectedIndex != nil) {
+            performSegue(withIdentifier: "chkInSegue", sender: self)
+        }else{
+              //alert user if no selection made
+            let alert = UIAlertController(title: "Alert", message: "Please select a place before continuing.", preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+            self.present(alert, animated: true)
+        }
+    }
+    
 }
 
 
@@ -188,44 +204,47 @@ extension MapViewController : UITableViewDelegate, UITableViewDataSource {
     
     //TableView DataSource Methods
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return poi.count
+        print("nearHundred count: \(nearHundred.count)")
+        return filteredNearHundred.count
+        
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "pointOfInterestCell", for: indexPath)
-        let item = poi[indexPath.row]
+
+//        let item = nearHundred[indexPath.row]
+//        cell.textLabel?.text = item.address
+        let item = filteredNearHundred[indexPath.row]
         cell.textLabel?.text = item.address
+        
         //value = condition ? valueIfTrue : valueIfFalse
         cell.accessoryType = item.done == true ? .checkmark : .none
-        
-        
         return cell
     }
     
     func tableView(_ tableView: UITableView, didDeselectRowAt indexPath: IndexPath) {
-      //  self.searchBar.resignFirstResponder()
-        searchBar.endEditing(true)
+ 
+     
     }
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-       // self.searchBar.resignFirstResponder()
-        searchBar.endEditing(true)
-        if(selectedIndexPath != nil && indexPath != selectedIndexPath) {
-            tableView.cellForRow(at: selectedIndexPath!)?.accessoryType = .none
-            poi[(selectedIndexPath?.row)!].done = false
-        }
-        
-        
+      
         if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
-            poi[indexPath.row].done = false
+            filteredNearHundred[indexPath.row].done = false
+            selectedIndex = nil
+           
             mapView.clear()
             //tableView.reloadRows(at: [indexPath], with: .top)
         }else {
+            //clearing previously selected row
+                for poi in filteredNearHundred{
+                    poi.done = false
+                }
+            filteredNearHundred[indexPath.row].done = true
+            selectedIndex = indexPath.row
             
-            poi[indexPath.row].done = true
-            selectedIndexPath = indexPath
             mapView.clear()
             let marker = GMSMarker()
-            marker.position = CLLocationCoordinate2D(latitude: poi[indexPath.row].latitude, longitude: poi[indexPath.row].longitude)
+            marker.position = CLLocationCoordinate2D(latitude: filteredNearHundred[indexPath.row].latitude, longitude: filteredNearHundred[indexPath.row].longitude)
             marker.map = mapView
             self.mapView.animate(toLocation: marker.position)
         }
@@ -234,7 +253,22 @@ extension MapViewController : UITableViewDelegate, UITableViewDataSource {
         
     }
     
+    func updateSearchResults(for searchController: UISearchController) {
+        if let searchText = searchController.searchBar.text {
+            filteredNearHundred = searchText.isEmpty ? nearHundred : nearHundred.filter({( poi : PointOfInterest) -> Bool in
+            return poi.address.lowercased().contains(searchText.lowercased())
+            })
+        
+            self.pointOfInterestTableView.reloadData()
+        }
+        
+    }
+    
+    
+    
 }
+
+
 
 
 

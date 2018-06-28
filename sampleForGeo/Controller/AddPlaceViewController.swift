@@ -12,23 +12,25 @@ import GooglePlaces
 import RealmSwift
 
 
-class AddPlaceViewController: UIViewController, UserLocationDelegate,
+class AddPlaceViewController: UIViewController, 
     GMSAutocompleteViewControllerDelegate, GMSMapViewDelegate
 {
     
     @IBOutlet weak var newPlacMapView: GMSMapView!
     
+    @IBOutlet weak var errorPlaceLabel: UILabel!
     @IBOutlet weak var placeTextField: UITextField!
-    @IBOutlet weak var imageMarker: UIImageView!
+  
     var currentLocation = CLLocation()
     var marker = GMSMarker()
     let realm = try! Realm()
     
     
-    let newPlace = POI()
+   
     
     override func viewDidLoad() {
         super.viewDidLoad()
+     
         /* let imageMarker = UIImageView(frame: CGRect(x: self.view.frame.width/2-25, y: self.view.frame.height/2-25, width: 50, height: 50))
          let myImage: UIImage = UIImage(named: "Icon-Small-50x50")!
          imageMarker.image = myImage
@@ -40,6 +42,7 @@ class AddPlaceViewController: UIViewController, UserLocationDelegate,
         newPlacMapView.delegate = self
     }
     
+   
     func setUpMap(){
         let camera = GMSCameraPosition.camera(withLatitude: currentLocation.coordinate.latitude,longitude: currentLocation.coordinate.longitude, zoom: 16)
         newPlacMapView.camera = camera
@@ -60,16 +63,25 @@ class AddPlaceViewController: UIViewController, UserLocationDelegate,
     
     
     @IBAction func addPlacePressed(_ sender: Any) {
-        newPlace.address = placeTextField.text!
-        newPlace.latitude = marker.position.latitude
-        newPlace.longitude = marker.position.longitude
-        do{
-            try realm.write{
-                realm.add(newPlace)
-            }
-        }catch{
-            print("Error adding place to realm \(error)")
+        if(placeTextField.text?.count == 0){
+            errorPlaceLabel.isHidden = false
         }
+        else {
+            let newPlace = POI()
+            newPlace.address = placeTextField.text!
+            newPlace.latitude = marker.position.latitude
+            newPlace.longitude = marker.position.longitude
+            do{
+                try realm.write{
+                    realm.add(newPlace)
+                    _ = navigationController?.popViewController(animated: true)
+                }
+            }catch{
+                print("Error adding place to realm \(error)")
+            }
+            
+        }
+        
     }
     
     func mapView(_ mapView: GMSMapView, didBeginDragging marker: GMSMarker) {
@@ -93,7 +105,7 @@ class AddPlaceViewController: UIViewController, UserLocationDelegate,
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if(segue.identifier == "addPlaceSegue") {
             let destinationVC = segue.destination as! MapViewController
-            destinationVC.delegate = self
+          
         }
     }
     
