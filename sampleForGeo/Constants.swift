@@ -16,7 +16,7 @@ struct Constants {
     struct Domains {
         static let Dev = "http://"
         static let UAT = "http://"
-        static let Local = "192.145.1.1"
+        static let Stag = "http://49.207.180.189:8020/taskease/"
         static let Production = "http://enterprise.thetaskease.com/taskease/"
 
     }

@@ -236,12 +236,12 @@
                                     <constraint firstAttribute="height" constant="75" id="dkN-fU-9Oa"/>
                                 </constraints>
                             </view>
-                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="2Ux-cv-guu">
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="grouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="2Ux-cv-guu">
                                 <rect key="frame" x="0.0" y="139" width="375" height="528"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <color key="backgroundColor" cocoaTouchSystemColor="groupTableViewBackgroundColor"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="listCell" id="WuO-lU-g5f" customClass="chkListCell" customModule="sampleForGeo" customModuleProvider="target">
-                                        <rect key="frame" x="0.0" y="28" width="375" height="44"/>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="blue" indentationWidth="10" reuseIdentifier="listCell" id="WuO-lU-g5f" customClass="chkListCell" customModule="sampleForGeo" customModuleProvider="target">
+                                        <rect key="frame" x="0.0" y="55.5" width="375" height="44"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="WuO-lU-g5f" id="OWz-D5-fQ8">
                                             <rect key="frame" x="0.0" y="0.0" width="375" height="43.5"/>
@@ -305,10 +305,10 @@
                     <connections>
                         <outlet property="acctLabel" destination="rWM-FY-Z5h" id="wzL-E5-vvi"/>
                         <outlet property="tableView" destination="2Ux-cv-guu" id="nqo-eM-e0S"/>
-                        <segue destination="efS-K1-eWk" kind="show" id="KOR-Gy-kEX"/>
-                        <segue destination="58R-Jn-0zK" kind="show" id="UMF-aK-xn6"/>
-                        <segue destination="ZMv-Zr-Hze" kind="show" id="rLo-v8-DDm"/>
-                        <segue destination="y7E-bj-Xs1" kind="show" id="JMj-ZQ-Fh9"/>
+                        <segue destination="efS-K1-eWk" kind="show" identifier="commentSegue" id="KOR-Gy-kEX"/>
+                        <segue destination="58R-Jn-0zK" kind="show" identifier="pictureSegue" id="UMF-aK-xn6"/>
+                        <segue destination="ZMv-Zr-Hze" kind="show" identifier="formSegue" id="rLo-v8-DDm"/>
+                        <segue destination="y7E-bj-Xs1" kind="show" identifier="categorySegue" id="JMj-ZQ-Fh9"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="zKl-JW-4l3" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -445,10 +445,10 @@
             </objects>
             <point key="canvasLocation" x="2447.1999999999998" y="19.340329835082461"/>
         </scene>
-        <!--View Controller-->
+        <!--Comments View Controller-->
         <scene sceneID="EsB-Jw-9tD">
             <objects>
-                <viewController id="efS-K1-eWk" sceneMemberID="viewController">
+                <viewController id="efS-K1-eWk" customClass="CommentsViewController" customModule="sampleForGeo" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="pUC-fF-6em">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -459,10 +459,10 @@
             </objects>
             <point key="canvasLocation" x="2366" y="1522"/>
         </scene>
-        <!--View Controller-->
+        <!--Pictures View Controller-->
         <scene sceneID="NCx-ze-ZQF">
             <objects>
-                <viewController id="58R-Jn-0zK" sceneMemberID="viewController">
+                <viewController id="58R-Jn-0zK" customClass="PicturesViewController" customModule="sampleForGeo" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="7Cm-MM-6zB">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -474,10 +474,10 @@
             </objects>
             <point key="canvasLocation" x="3231" y="1579"/>
         </scene>
-        <!--View Controller-->
+        <!--Forms View Controller-->
         <scene sceneID="POI-EC-y1v">
             <objects>
-                <viewController id="ZMv-Zr-Hze" sceneMemberID="viewController">
+                <viewController id="ZMv-Zr-Hze" customClass="FormsViewController" customModule="sampleForGeo" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="cZh-f3-laa">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -489,10 +489,10 @@
             </objects>
             <point key="canvasLocation" x="4079" y="1578"/>
         </scene>
-        <!--View Controller-->
+        <!--Category View Controller-->
         <scene sceneID="PXg-TD-zNL">
             <objects>
-                <viewController id="y7E-bj-Xs1" sceneMemberID="viewController">
+                <viewController id="y7E-bj-Xs1" customClass="CategoryViewController" customModule="sampleForGeo" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="DJK-7X-Zhz">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>

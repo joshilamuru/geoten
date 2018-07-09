@@ -70,9 +70,10 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func logInPressed(_ sender: Any) {
-        SVProgressHUD.show()
+        
         if((validate(userTextfield).0) && (validate(passwordTextfield).0)){
             print("both are valid")
+            SVProgressHUD.show()
             if(authenticateUser(username: userTextfield.text!, password: passwordTextfield.text!)) {
                 SVProgressHUD.dismiss()
                 self.performSegue(withIdentifier: "loginPressedSegue", sender: self)
@@ -90,7 +91,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     }
     
     func authenticateUser(username: String, password: String) ->Bool {
-        let url = Constants.Domains.Production
+        let url = Constants.Domains.Stag
         //+ Constants.authUserMethod
         //{"eMail":"user2@taskease.com","password":"21232f297a57a5a743894a0e4a801fc3","mobileIMEINumber":"911430509678238","deviceID":"APA91bGIWYSx_ufY3fMVu0z1jk4U_LVvh-FdFhDJUrlZA0igkpJH0sJ-k9tRv11N24T9_-ccADRAKMCOldHKDdaIOD1WucuCX_AL9s_6_8-7PKMzDeSdo8MQql0EQDUnsMZ7E6TPlvfXZCrplk4U9DFL2oH2OyJEkw","mobileInfo":"VERSION.RELEASE-6.0,MODEL-Android SDK built for x86,TASKEASE_VERSION_NAME-Revamp 2.51.67","osType":"ANDROID"}
         
@@ -101,7 +102,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
             ["eMail": username, "password": encryptedPassword, "mobileIMEINumber": "NA", "deviceID":
                 (UIDevice.current.identifierForVendor?.uuidString)!,"mobileInfo":UIDevice.current.systemVersion, "osType": "iOS" ]
         
-      /*  Alamofire.request(url , method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: nil)
+        Alamofire.request(url , method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: nil)
             .responseJSON { response in
                 print(response.request as Any)
                 print(response.response as Any)
@@ -113,7 +114,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                     print("Error \(response.result.error)")
                     
                 }
-        }*/
+        }
         
         return true
     }

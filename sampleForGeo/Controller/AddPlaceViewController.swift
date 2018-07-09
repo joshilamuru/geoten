@@ -12,8 +12,8 @@ import GooglePlaces
 import RealmSwift
 
 
-class AddPlaceViewController: UIViewController, 
-    GMSAutocompleteViewControllerDelegate, GMSMapViewDelegate
+class AddPlaceViewController:
+    UIViewController, GMSAutocompleteViewControllerDelegate, GMSMapViewDelegate
 {
     
     @IBOutlet weak var newPlacMapView: GMSMapView!
@@ -21,16 +21,17 @@ class AddPlaceViewController: UIViewController,
     @IBOutlet weak var errorPlaceLabel: UILabel!
     @IBOutlet weak var placeTextField: UITextField!
   
-    var currentLocation = CLLocation()
+   var currentLocation = CLLocation()
     var marker = GMSMarker()
     let realm = try! Realm()
-    
-    
-   
+    var bounds = GMSCoordinateBounds()
+    var visibleRegion = GMSVisibleRegion()
+    var camera = GMSCameraPosition()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-     
+        NotificationCenter.default.addObserver(self, selector: #selector(AddPlaceViewController.updateCurrentLocation), name: NSNotification.Name(rawValue: "currentLoc"), object: nil)
+        
         /* let imageMarker = UIImageView(frame: CGRect(x: self.view.frame.width/2-25, y: self.view.frame.height/2-25, width: 50, height: 50))
          let myImage: UIImage = UIImage(named: "Icon-Small-50x50")!
          imageMarker.image = myImage
@@ -42,21 +43,24 @@ class AddPlaceViewController: UIViewController,
         newPlacMapView.delegate = self
     }
     
-   
+    @objc func updateCurrentLocation(notification: Notification){
+        currentLocation = notification.userInfo?["value"] as! CLLocation
+    }
     func setUpMap(){
-        let camera = GMSCameraPosition.camera(withLatitude: currentLocation.coordinate.latitude,longitude: currentLocation.coordinate.longitude, zoom: 16)
+        camera = GMSCameraPosition.camera(withLatitude: currentLocation.coordinate.latitude,longitude: currentLocation.coordinate.longitude, zoom: 20)
         newPlacMapView.camera = camera
+        newPlacMapView.setMinZoom(15, maxZoom: 20)
         //newPlacMapView.isMyLocationEnabled = true
         // newPlacMapView.settings.myLocationButton = true
         print("current location in appPlacevc: \(currentLocation)")
-        let gmsCircle = GMSCircle(position: currentLocation.coordinate, radius: 100)
-        let update = GMSCameraUpdate.fit(gmsCircle.bounds())
-        newPlacMapView.animate(with: update)
+//        let gmsCircle = GMSCircle(position: currentLocation.coordinate, radius: 100)
+//        let update = GMSCameraUpdate.fit(gmsCircle.bounds())
+//        newPlacMapView.animate(with: update)
         
         marker.position = currentLocation.coordinate
         marker.isDraggable = true
         marker.map = self.newPlacMapView
-        
+       
         
         
     }
@@ -67,6 +71,7 @@ class AddPlaceViewController: UIViewController,
             errorPlaceLabel.isHidden = false
         }
         else {
+            
             let newPlace = POI()
             newPlace.address = placeTextField.text!
             newPlace.latitude = marker.position.latitude
@@ -95,6 +100,32 @@ class AddPlaceViewController: UIViewController,
         marker.infoWindowAnchor = CGPoint(x: 0.5, y: 0.5)
         marker.title = "Location"
         marker.snippet = "Latitude: \(marker.position.latitude),Longitude: \(marker.position.longitude) "
+    }
+    
+    func mapView(_ mapView: GMSMapView, didTapAt coordinate: CLLocationCoordinate2D) {
+        let newLat = coordinate.latitude
+        let newLong = coordinate.longitude
+        let loc = CLLocation(latitude: newLat, longitude: newLong)
+        if (currentLocation.distance(from: loc) > 100){
+            let alert = UIAlertController(title: "Alert", message: "Please select a place within 100 mts of your current location", preferredStyle: .alert)
+            
+            alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
+            self.present(alert, animated: true)
+        //    setUpMap()
+            
+        }
+        else{
+            marker.position = coordinate
+           
+            camera = GMSCameraPosition.camera(withLatitude: newLat,longitude: newLong, zoom: 20)
+            newPlacMapView.animate(to: camera)
+        }
+    }
+   
+    
+    func mapView(mapView: GMSMapView, didChangeCameraPosition position: GMSCameraPosition) {
+        
+       print("from didchangecamera position")
     }
     
     func locationData(location: CLLocation) {
@@ -128,7 +159,7 @@ class AddPlaceViewController: UIViewController,
         print("Place address: \(place.formattedAddress)")
         dismiss(animated: true, completion: nil)
         newPlacMapView.clear()
-        let marker = GMSMarker()
+        
         marker.position = place.coordinate
         marker.map = newPlacMapView
         self.newPlacMapView.animate(toLocation: place.coordinate)

@@ -17,11 +17,17 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
     var window: UIWindow?
    
     let realm = try! Realm()
-    //let locationManager = CLLocationManager()
+   
+    var mapViewController: MapViewController?
+    var locationService: LocationService?
+    
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
-       
-       
+        self.mapViewController = MapViewController()
+        NotificationCenter.default.addObserver(mapViewController!, selector: #selector(MapViewController.updateCurrentLocation), name: Notification.Name.currentLoc, object: nil)
         
+         self.locationService = LocationService()
+      
+      
         UIApplication.shared.statusBarStyle = UIStatusBarStyle.lightContent
        // UINavigationBar.appearance().tintColor = UIColor.orange
         UINavigationBar.appearance().backgroundColor = UIColor.orange

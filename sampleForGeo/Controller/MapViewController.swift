@@ -49,14 +49,34 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
     var selectedPlace : GMSPlace?
     var searchController: UISearchController!
     let realm = try! Realm()
+    var locationService: LocationService?
+    
    
     override func viewDidLoad() {
         
         super.viewDidLoad()
         initLocationManager()
+       //  locationService = LocationService()
+      //   locationService.initLocationManager()
+//      NotificationCenter.default.addObserver(self, selector: #selector(MapViewController.updateCurrentLocation), name: Notification.Name.currentLoc, object: nil)
+//
+       
         pointOfInterestTableView.delegate = self
         pointOfInterestTableView.dataSource = self
+        
+        
+
+        print("Current location obtained :  \(currentLocation.coordinate.latitude, currentLocation.coordinate.longitude)")
+       
+            
+        //loadPOI()
+        //initMap()
+        
         //mapView.delegate = self
+        
+        //setting up notification
+       
+        
         
         //Initializing searchResultsController to nil meaning searchController will use this view controller
         //to display the results
@@ -75,6 +95,15 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
         //self.extendedLayoutIncludesOpaqueBars = true
     }
     
+    @objc func updateCurrentLocation(notification: Notification) {
+        print("entered updateCurrentLocation")
+       
+        currentLocation = notification.userInfo?["value"] as! CLLocation
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: "currentLoc"), object: nil)
+    }
     func initLocationManager() {
         //Setup location manager
         locationManager.delegate = self
@@ -82,7 +111,15 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
     }
-    
+    func initMap() {
+        let camera = GMSCameraPosition.camera(withLatitude: (currentLocation.coordinate.latitude),longitude: (currentLocation.coordinate.longitude), zoom: 16)
+        mapView.camera = camera
+        mapView.isMyLocationEnabled = true
+        mapView.settings.myLocationButton = true
+        let gmsCircle = GMSCircle(position: (currentLocation.coordinate), radius: 100)
+        let update = GMSCameraUpdate.fit(gmsCircle.bounds())
+        mapView.animate(with: update)
+    }
     func loadPOI(){
         
         let savedPlaces = Array(realm.objects(POI.self))
@@ -103,7 +140,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
     }
     
     func sortNearHundredByDistance() {
-       nearHundred.sort(by: {$0.distanceFromUser(userLoc: currentLocation) < $1.distanceFromUser(userLoc: currentLocation)})
+        nearHundred.sort(by: {$0.distanceFromUser(userLoc: currentLocation) < $1.distanceFromUser(userLoc: currentLocation)})
     
     }
     
@@ -131,7 +168,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if(segue.identifier == "addPlaceSegue") {
             let destinationVC = segue.destination as! AddPlaceViewController
-            destinationVC.currentLocation = currentLocation
+            destinationVC.currentLocation = (currentLocation)
             
             navigationItem.title = " "
             destinationVC.navigationItem.title = "Add A New Place"
@@ -158,10 +195,12 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
    
     //didUpdateLocations method
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        
         currentLocation = locations[locations.count-1] //getting the last updated location which is most accurate
         if currentLocation.horizontalAccuracy > 0 {
             locationManager.stopUpdatingLocation()
-           
+          //  let data : [String: CLLocation] = ["value" : currentLocation]
+            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "currentLoc"), object: nil, userInfo: ["value": currentLocation])
             loadPOI()
         
             print("longitude = \(currentLocation.coordinate.longitude), latitude = \(currentLocation.coordinate.latitude)")
@@ -173,7 +212,9 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
             let gmsCircle = GMSCircle(position: currentLocation.coordinate, radius: 100)
             let update = GMSCameraUpdate.fit(gmsCircle.bounds())
             mapView.animate(with: update)
-        
+           
+            
+            
         }
     }
     //didFailWithError method
@@ -182,7 +223,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
         //locationDetailLabel.text = "Location Unavailable"
     }
 
-    
+  
     @IBAction func chkInBtnPressed(_ sender: Any) {
       
         if(selectedIndex != nil) {

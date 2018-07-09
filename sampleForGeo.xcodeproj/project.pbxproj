@@ -18,6 +18,11 @@
 		CB55BF8920D0E5F10084375D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = CB55BF8720D0E5F10084375D /* LaunchScreen.storyboard */; };
 		CB5D7B2820D526B80042EE03 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB5D7B2720D526B80042EE03 /* Constants.swift */; };
 		CB69E1BD20D68DA300AF7430 /* LoginViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB69E1BC20D68DA300AF7430 /* LoginViewController.swift */; };
+		CB71DF1020E52DFE00AEC106 /* CommentsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB71DF0F20E52DFE00AEC106 /* CommentsViewController.swift */; };
+		CB71DF1220E52E1600AEC106 /* PicturesViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB71DF1120E52E1600AEC106 /* PicturesViewController.swift */; };
+		CB71DF1420E52E2800AEC106 /* FormsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB71DF1320E52E2800AEC106 /* FormsViewController.swift */; };
+		CB71DF1620E52E3900AEC106 /* CategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB71DF1520E52E3900AEC106 /* CategoryViewController.swift */; };
+		CB71DF1C20ECC2E500AEC106 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB71DF1B20ECC2E500AEC106 /* LocationService.swift */; };
 		CBC84E0F20D17B83005D6A82 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC84E0E20D17B83005D6A82 /* MapViewController.swift */; };
 		CBF70AE120DD12CC002E69D5 /* POI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF70AE020DD12CC002E69D5 /* POI.swift */; };
 /* End PBXBuildFile section */
@@ -37,6 +42,11 @@
 		CB55BF8A20D0E5F10084375D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		CB5D7B2720D526B80042EE03 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		CB69E1BC20D68DA300AF7430 /* LoginViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewController.swift; sourceTree = "<group>"; };
+		CB71DF0F20E52DFE00AEC106 /* CommentsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommentsViewController.swift; sourceTree = "<group>"; };
+		CB71DF1120E52E1600AEC106 /* PicturesViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PicturesViewController.swift; sourceTree = "<group>"; };
+		CB71DF1320E52E2800AEC106 /* FormsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormsViewController.swift; sourceTree = "<group>"; };
+		CB71DF1520E52E3900AEC106 /* CategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewController.swift; sourceTree = "<group>"; };
+		CB71DF1B20ECC2E500AEC106 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
 		CBC84E0E20D17B83005D6A82 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
 		CBF70AE020DD12CC002E69D5 /* POI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = POI.swift; sourceTree = "<group>"; };
 		D05F9909EEEEB78515C60752 /* Pods-sampleForGeo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-sampleForGeo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-sampleForGeo/Pods-sampleForGeo.debug.xcconfig"; sourceTree = "<group>"; };
@@ -116,13 +126,26 @@
 		CB69E1BB20D68C6100AF7430 /* Controller */ = {
 			isa = PBXGroup;
 			children = (
+				CB71DF0E20E52DD100AEC106 /* CheckIn */,
 				CB69E1BC20D68DA300AF7430 /* LoginViewController.swift */,
 				CBC84E0E20D17B83005D6A82 /* MapViewController.swift */,
 				CB55BF7B20D0E5DA0084375D /* AppDelegate.swift */,
 				CB1BDA7620DB6BF2001FB883 /* AddPlaceViewController.swift */,
 				CB31D71A20E27D6200677D73 /* CheckInController.swift */,
+				CB71DF1B20ECC2E500AEC106 /* LocationService.swift */,
 			);
 			path = Controller;
+			sourceTree = "<group>";
+		};
+		CB71DF0E20E52DD100AEC106 /* CheckIn */ = {
+			isa = PBXGroup;
+			children = (
+				CB71DF0F20E52DFE00AEC106 /* CommentsViewController.swift */,
+				CB71DF1120E52E1600AEC106 /* PicturesViewController.swift */,
+				CB71DF1320E52E2800AEC106 /* FormsViewController.swift */,
+				CB71DF1520E52E3900AEC106 /* CategoryViewController.swift */,
+			);
+			path = CheckIn;
 			sourceTree = "<group>";
 		};
 		CBD30F2820D6615200E88576 /* View */ = {
@@ -286,14 +309,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CB71DF1C20ECC2E500AEC106 /* LocationService.swift in Sources */,
 				CB1BDA7720DB6BF2001FB883 /* AddPlaceViewController.swift in Sources */,
 				CB69E1BD20D68DA300AF7430 /* LoginViewController.swift in Sources */,
 				CB1BDA7920DB76CB001FB883 /* GMSCircle+Bounds.swift in Sources */,
 				CB5D7B2820D526B80042EE03 /* Constants.swift in Sources */,
+				CB71DF1220E52E1600AEC106 /* PicturesViewController.swift in Sources */,
 				CBF70AE120DD12CC002E69D5 /* POI.swift in Sources */,
+				CB71DF1420E52E2800AEC106 /* FormsViewController.swift in Sources */,
 				CB55BF7C20D0E5DA0084375D /* AppDelegate.swift in Sources */,
 				CB55BF8420D0E5DB0084375D /* sampleForGeo.xcdatamodeld in Sources */,
 				CBC84E0F20D17B83005D6A82 /* MapViewController.swift in Sources */,
+				CB71DF1620E52E3900AEC106 /* CategoryViewController.swift in Sources */,
+				CB71DF1020E52DFE00AEC106 /* CommentsViewController.swift in Sources */,
 				CB31D71B20E27D6200677D73 /* CheckInController.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

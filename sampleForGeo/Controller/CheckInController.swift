@@ -43,14 +43,14 @@ class CheckInController: UIViewController, UITableViewDelegate, UITableViewDataS
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-         let cell = tableView.cellForRow(at: indexPath as IndexPath)
-        if cell?.textLabel?.text == "Comments" {
+         let cell = tableView.cellForRow(at: indexPath as IndexPath) as! chkListCell
+        if cell.listLabel.text == "Comments" {
             performSegue(withIdentifier: "commentSegue", sender: self)
-        }else if cell?.textLabel?.text == "Pictures" {
+        }else if cell.listLabel.text == "Pictures" {
             performSegue(withIdentifier: "pictureSegue", sender: self)
-        }else if cell?.textLabel?.text == "Forms" {
+        }else if cell.listLabel.text == "Forms" {
             performSegue(withIdentifier: "formSegue", sender: self)
-        }else if cell?.textLabel?.text == "Category/Subcategories" {
+        }else if cell.listLabel.text == "Category/Subcategories" {
                 performSegue(withIdentifier: "categorySegue", sender: self)
         }
     }
