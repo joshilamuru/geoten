@@ -18,6 +18,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     
     @IBOutlet weak var userValidationLabel: UILabel!
     @IBOutlet weak var passwordValidationLabel: UILabel!
+     var authenticated = false
     
     
     override func viewDidLoad() {
@@ -74,9 +75,14 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         if((validate(userTextfield).0) && (validate(passwordTextfield).0)){
             print("both are valid")
             SVProgressHUD.show()
-            if(authenticateUser(username: userTextfield.text!, password: passwordTextfield.text!)) {
-                SVProgressHUD.dismiss()
-                self.performSegue(withIdentifier: "loginPressedSegue", sender: self)
+            authenticateUser(username: userTextfield.text!, password: passwordTextfield.text!) {
+            (response) in
+                if(self.authenticated){
+                    //get the accounts from server
+                    
+                    SVProgressHUD.dismiss()
+                    self.performSegue(withIdentifier: "loginPressedSegue", sender: self)
+                }
             }
         }else
         {
@@ -90,33 +96,47 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         
     }
     
-    func authenticateUser(username: String, password: String) ->Bool {
-        let url = Constants.Domains.Stag
+    func authenticateUser(username: String, password: String, completion: @escaping (Bool) -> Void) {
+        
+        
+        //let url = Constants.Domains.Stag + Constants.authUserMethod
+        let url = "http://49.207.180.189:8082/taskease/authenticationUser.htm"
         //+ Constants.authUserMethod
         //{"eMail":"user2@taskease.com","password":"21232f297a57a5a743894a0e4a801fc3","mobileIMEINumber":"911430509678238","deviceID":"APA91bGIWYSx_ufY3fMVu0z1jk4U_LVvh-FdFhDJUrlZA0igkpJH0sJ-k9tRv11N24T9_-ccADRAKMCOldHKDdaIOD1WucuCX_AL9s_6_8-7PKMzDeSdo8MQql0EQDUnsMZ7E6TPlvfXZCrplk4U9DFL2oH2OyJEkw","mobileInfo":"VERSION.RELEASE-6.0,MODEL-Android SDK built for x86,TASKEASE_VERSION_NAME-Revamp 2.51.67","osType":"ANDROID"}
         
         //let encryptedPassword = MD5(string: password).toHexString()
         
         let encryptedPassword = password.md5()
-        let parameters: [String: String] =
-            ["eMail": username, "password": encryptedPassword, "mobileIMEINumber": "NA", "deviceID":
+        
+        let message: [String: String] =
+            ["eMail": username, "password": encryptedPassword, "mobileIMEINumber": "911430509678238", "deviceID":
                 (UIDevice.current.identifierForVendor?.uuidString)!,"mobileInfo":UIDevice.current.systemVersion, "osType": "iOS" ]
-        
-        Alamofire.request(url , method: .post, parameters: parameters, encoding: JSONEncoding.default, headers: nil)
-            .responseJSON { response in
-                print(response.request as Any)
-                print(response.response as Any)
-                print(response.result.value as Any)
-                if response.result.isSuccess {
-                    print("success - authenticated")
-                }
-                else {
-                    print("Error \(response.result.error)")
-                    
-                }
+    
+       
+        Alamofire.request(url, method: .post, parameters: message, encoding: JSONEncoding.default, headers: nil).responseJSON
+             {
+                (response) in
+                
+                        print(response.request as Any)
+                        print(response.response as Any)
+                        print(response.result.value as Any)
+                
+                    if response.result.isSuccess{
+                        print("success - authenticated")
+                        self.authenticated = true
+                        SVProgressHUD.dismiss()
+                        
+                    }
+                    else {
+                        print("Error \(response.result.error)")
+                        self.authenticated = false
+                        SVProgressHUD.dismiss()
+                        
+                    }
+                completion(self.authenticated)
+             
         }
-        
-        return true
+       
     }
     struct CustomEncoding: ParameterEncoding {
         func encode(_ urlRequest: URLRequestConvertible, with parameters: Parameters?) throws -> URLRequest {
