@@ -13,6 +13,7 @@ pod 'GoogleMaps'
 pod 'CryptoSwift'
 pod 'RealmSwift'
 pod 'SVProgressHUD'
-
+pod 'Eureka'
+pod 'ImageRow'
 
 end

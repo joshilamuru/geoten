@@ -19,16 +19,17 @@ class PointOfInterest: NSObject {
     var latitude : Double
     var longitude : Double
     var done : Bool = false
-    
+    var taskTypeID: Int
     func distanceFromUser(userLoc: CLLocation) -> Double {
        return CLLocation(latitude: latitude, longitude: longitude).distance(from: userLoc)
     }
     
     
-    init(address: String, latitude: Double, longitude: Double) {
+    init(address: String, latitude: Double, longitude: Double, taskTypeID: Int) {
         self.address = address
         self.latitude = latitude
         self.longitude = longitude
+        self.taskTypeID = taskTypeID
     }
 }
 
@@ -125,8 +126,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
         let savedPlaces = Array(realm.objects(POI.self))
         nearHundred.removeAll()
         for place in savedPlaces {
-            if(calcDistanceFromUser(place: place) <= 100.0) {
-                let nearHundredPlace = PointOfInterest(address: place.address, latitude: place.latitude, longitude: place.longitude )
+            if(calcDistanceFromUser(place: place) >= 100.0) {
+                let nearHundredPlace = PointOfInterest(address: place.name, latitude: place.latitude, longitude: place.longitude, taskTypeID: place.TasktypeID )
                 nearHundred.append(nearHundredPlace)
                 
             }
@@ -172,12 +173,14 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
             
             navigationItem.title = " "
             destinationVC.navigationItem.title = "Add A New Place"
-        }else if (segue.identifier == "chkInSegue") {
-            let destinationVC = segue.destination as! CheckInController
+        }else if (segue.identifier == "formSegue") {
+            let destinationVC = segue.destination as! DynamicFormViewController
             navigationItem.title = ""
           
             if(selectedIndex != nil){
             destinationVC.acct = filteredNearHundred[selectedIndex].address
+            destinationVC.taskTypeID = filteredNearHundred[selectedIndex].taskTypeID
+                //print(filteredNearHundred[selectedIndex])
             }else
             {
                 print("no row selected in tableview")
@@ -227,7 +230,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
     @IBAction func chkInBtnPressed(_ sender: Any) {
       
         if(selectedIndex != nil) {
-            performSegue(withIdentifier: "chkInSegue", sender: self)
+            performSegue(withIdentifier: "formSegue", sender: self)
         }else{
               //alert user if no selection made
             let alert = UIAlertController(title: "Alert", message: "Please select a place before continuing.", preferredStyle: .alert)

@@ -1,6 +1,7 @@
 PODS:
   - Alamofire (4.7.2)
   - CryptoSwift (0.10.0)
+  - Eureka (4.1.1)
   - GoogleMaps (2.7.0):
     - GoogleMaps/Maps (= 2.7.0)
   - GoogleMaps/Base (2.7.0)
@@ -11,6 +12,8 @@ PODS:
     - GooglePlaces (= 2.7.0)
   - GooglePlaces (2.7.0):
     - GoogleMaps/Base (= 2.7.0)
+  - ImageRow (3.1.0):
+    - Eureka (~> 4.0)
   - Realm (3.7.1):
     - Realm/Headers (= 3.7.1)
   - Realm/Headers (3.7.1)
@@ -22,9 +25,11 @@ PODS:
 DEPENDENCIES:
   - Alamofire
   - CryptoSwift
+  - Eureka
   - GoogleMaps
   - GooglePlacePicker
   - GooglePlaces
+  - ImageRow
   - RealmSwift
   - SVProgressHUD
   - SwiftyJSON
@@ -33,9 +38,11 @@ SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - Alamofire
     - CryptoSwift
+    - Eureka
     - GoogleMaps
     - GooglePlacePicker
     - GooglePlaces
+    - ImageRow
     - Realm
     - RealmSwift
     - SVProgressHUD
@@ -44,14 +51,16 @@ SPEC REPOS:
 SPEC CHECKSUMS:
   Alamofire: e4fa87002c137ba2d8d634d2c51fabcda0d5c223
   CryptoSwift: 6c778d69282bed3b4e975ff97a79d074f20bb011
+  Eureka: b88fb930e42c79f8c03c373d0fcdc28c1d6c50ed
   GoogleMaps: f79af95cb24d869457b1f961c93d3ce8b2f3b848
   GooglePlacePicker: 59ea44db173c58486ad6123993e81feefcbce9c3
   GooglePlaces: 3d06e6c99654545b4738ce49648745779c25f2ef
+  ImageRow: 1ea483078bfa3d880a7fc76fdfcddfd5f29a9e6b
   Realm: 906be37d52f17f25484ac01643a7f26a9d3bfbd5
   RealmSwift: 1c2b6bae3dc55bb87e080ffa96537d71442f6dce
   SVProgressHUD: 1428aafac632c1f86f62aa4243ec12008d7a51d6
   SwiftyJSON: c29297daf073d2aa016295d5809cdd68045c39b3
 
-PODFILE CHECKSUM: dba5c6d442feca212b016206ce25bb684fcc5da0
+PODFILE CHECKSUM: 0c9c3c079e1f250116069651723b9d36caf30949
 
 COCOAPODS: 1.5.3

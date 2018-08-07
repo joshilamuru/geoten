@@ -12,13 +12,18 @@ import RealmSwift
 import CoreLocation
 
 class POI: Object {
-   
+    
+    @objc dynamic var name: String = ""
     @objc dynamic var address : String = ""
     @objc dynamic var latitude : Double = 0.0
     @objc dynamic var longitude : Double = 0.0
+    @objc dynamic var accountID : String = UUID().uuidString
+    @objc dynamic var TasktypeID: Int = 0
  //   @objc dynamic var done : Bool = false
-    
-    
+//    
+    override static func primaryKey() -> String? {
+        return "accountID"
+    }
     func calcDistanceFromUser(userLoc: CLLocation) -> Double {
         return CLLocation(latitude: latitude, longitude: longitude).distance(from: userLoc)
     }

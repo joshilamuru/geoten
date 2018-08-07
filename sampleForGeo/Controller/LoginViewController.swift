@@ -11,6 +11,7 @@ import CryptoSwift
 import Alamofire
 import SwiftyJSON
 import SVProgressHUD
+import RealmSwift
 
 class LoginViewController: UIViewController, UITextFieldDelegate {
     @IBOutlet weak var userTextfield: UITextField!
@@ -18,9 +19,10 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     
     @IBOutlet weak var userValidationLabel: UILabel!
     @IBOutlet weak var passwordValidationLabel: UILabel!
-     var authenticated = false
-    
-    
+    var authenticated = false
+    let realm = try! Realm()
+    var encryptedPassword = ""
+   
     override func viewDidLoad() {
         super.viewDidLoad()
         self.userTextfield.delegate = self
@@ -71,17 +73,18 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func logInPressed(_ sender: Any) {
-        
+       
         if((validate(userTextfield).0) && (validate(passwordTextfield).0)){
             print("both are valid")
             SVProgressHUD.show()
-            authenticateUser(username: userTextfield.text!, password: passwordTextfield.text!) {
+            encryptedPassword = passwordTextfield.text!.md5()
+            authenticateUser(username: userTextfield.text!, password: encryptedPassword) {
             (response) in
                 if(self.authenticated){
-                    //get the accounts from server
-                    
-                    SVProgressHUD.dismiss()
-                    self.performSegue(withIdentifier: "loginPressedSegue", sender: self)
+                    //get the tasktypes and accounts from server
+                      self.loadTaskTypefromServer(username: self.userTextfield.text!, password: self.encryptedPassword)
+                    self.loadPOIfromServer(username: self.userTextfield.text!, password: self.encryptedPassword)
+                  
                 }
             }
         }else
@@ -96,6 +99,154 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         
     }
     
+    func loadTaskTypefromServer(username: String, password: String) -> Void {
+        let url = Constants.Domains.Stag + Constants.syncTaskTypes
+        let input : [String: Any] = [ "TaskTypeLUV": 0,
+                                      "CustomFieldLUV": 0,
+                                      "FormFieldLUV": 0,
+                                      "FormTypeLUV": 0,
+                                      "FormTaskTypeLUV": 0,
+                                      "eMail": username,
+                                      "mobileIMEINumber": "911430509678238",
+                                      "password": password]
+        Alamofire.request(url, method: .post, parameters: input, encoding: JSONEncoding.default, headers: nil).responseJSON
+            {
+                (response) in
+                
+                print(response.request as Any)
+                print(response.response as Any)
+                print(response.result.value as Any)
+                
+                if response.result.isSuccess{
+                    //loadPOI in realm
+                    
+                    let result : JSON = JSON(response.result.value!)
+                    
+                    self.updateTaskTypesData(json: result)
+                    
+                    
+                    self.updateCustomFieldData(json: result)
+                   
+                }
+                
+        }
+    }
+    func loadPOIfromServer(username: String, password: String) -> Void {
+        //
+        let url = Constants.Domains.Stag + Constants.requestPOI
+       // let url = "http://49.207.180.189:8082/taskease/requestAT.htm"
+        let input: [String: Any] = [ "TaskTypeLUV": 0,
+                                     "CustomFieldLUV": 0,
+                                     "FormFieldLUV": 0,
+                                     "FormTypeLUV": 0,
+                                     "FormTaskTypeLUV": 0,
+                                     "eMail": username,
+                                     "mobileIMEINumber": "911430509678238",
+                                     "password": password]
+      
+        Alamofire.request(url, method: .post, parameters: input, encoding: JSONEncoding.default, headers: nil).responseJSON
+            {
+                (response) in
+                
+                print(response.request as Any)
+                print(response.response as Any)
+                print(response.result.value as Any)
+                
+                if response.result.isSuccess{
+                    //loadPOI in realm
+                  
+                    let acctsJSON : JSON = JSON(response.result.value!)
+                    
+                    self.updatePOIData(json: acctsJSON)
+                    SVProgressHUD.dismiss()
+                    self.performSegue(withIdentifier: "loginPressedSegue", sender: self)
+                }
+                else {
+                    print("Error \(response.result.error)")
+                    
+                    
+                }
+                
+                
+        }
+    }
+    
+    func updateTaskTypesData(json: JSON) {
+        for item in json["tasktype"].arrayValue {
+        print(item["TaskTypeID"].intValue)
+            do{
+                try realm.write{
+                    let taskType = TaskType()
+                    taskType.Desc = item["Desc"].stringValue
+                    taskType.JobType = item["JobType"].stringValue
+                    taskType.JobTypeID = item["JobTypeID"].intValue
+                    taskType.OrganizationID = item["OrganizationID"].intValue
+                    taskType.TaskTypeID = item["TaskTypeID"].stringValue
+                    taskType.TypeName = item["TypeName"].stringValue
+                    realm.add(taskType, update: true)
+                }
+            }catch{
+                print("Error adding place to realm \(error)")
+            }
+            
+            
+        }
+    }
+    
+    func updateCustomFieldData(json: JSON) {
+        for item in json["customfield"].arrayValue {
+            do{
+                try realm.write{
+                    let customField = CustomField()
+                    customField.CFormFieldID = item["CFormFieldID"].stringValue
+                    customField.Desc = item["Desc"].stringValue
+                    customField.DisplayName = item["DisplayName"].stringValue
+                    customField.EntryType = item["EntryType"].stringValue
+                    customField.TaskTypeID = item["TaskTypeID"].stringValue
+                    customField.DefaultValues = item["DefaultValues"].stringValue
+                    
+                    realm.add(customField, update: true)
+                }
+            }catch{
+                print("Error adding place to realm \(error)")
+            }
+        }
+    }
+    func updatePOIData(json: JSON){
+        
+        let count : Int = json["totalCount"].intValue
+     //   let count : Int = json["accountRead"].
+        if(count > 0) {
+        for i in 0..<count {
+           
+            do{
+                try realm.write{
+                    let newPlace = POI()
+                    newPlace.accountID = json["accountRead"][i]["accountID"].stringValue
+                    newPlace.TasktypeID = json["accountRead"][i]["TasktypeID"].intValue
+                    newPlace.name = json["accountRead"][i]["accountName"].stringValue
+                    newPlace.address = json["accountRead"][i]["taskAddress"].stringValue
+                    newPlace.latitude = json["accountRead"][i]["taskLat"].doubleValue
+                    newPlace.longitude = json["accountRead"][i]["taskLng"].doubleValue
+                    realm.add(newPlace, update: true)
+                  
+                  //  print("Successful in getting account \(i) from server")
+                   // print (json["accountRead"][i])
+                }
+            }catch{
+                print("Error adding place to realm \(error)")
+            }
+        }
+       //
+        
+        }else {
+            print("error getting data")
+        }
+        
+        
+       
+       
+    }
     func authenticateUser(username: String, password: String, completion: @escaping (Bool) -> Void) {
         
         
@@ -106,10 +257,10 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         
         //let encryptedPassword = MD5(string: password).toHexString()
         
-        let encryptedPassword = password.md5()
+        
         
         let message: [String: String] =
-            ["eMail": username, "password": encryptedPassword, "mobileIMEINumber": "911430509678238", "deviceID":
+            ["eMail": username, "password": password, "mobileIMEINumber": "911430509678238", "deviceID":
                 (UIDevice.current.identifierForVendor?.uuidString)!,"mobileInfo":UIDevice.current.systemVersion, "osType": "iOS" ]
     
        
@@ -124,7 +275,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                     if response.result.isSuccess{
                         print("success - authenticated")
                         self.authenticated = true
-                        SVProgressHUD.dismiss()
+                      //  SVProgressHUD.dismiss()
                         
                     }
                     else {
@@ -148,19 +299,6 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     }
     
     
-    /*func MD5(string: String) -> Data {
-     let messageData = string.data(using:.utf8)!
-     var digestData = Data(count: Int(CC_MD5_DIGEST_LENGTH))
-     
-     _ = digestData.withUnsafeMutableBytes {digestBytes in
-     messageData.withUnsafeBytes {messageBytes in
-     CC_MD5(messageBytes, CC_LONG(messageData.count), digestBytes)
-     }
-     }
-     
-     return digestData
-     }*/
-  
     
     @IBAction func userEditingDidChange(_ sender: UITextField) {
         userValidationLabel.isHidden = true
@@ -229,4 +367,5 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         return emailTest.evaluate(with: emailField)
     }
 }
+
 

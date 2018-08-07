@@ -9,6 +9,8 @@
 
 
 import UIKit
+import RealmSwift
+
 class chkListCell: UITableViewCell {
     
     @IBOutlet weak var listLabel: UILabel!

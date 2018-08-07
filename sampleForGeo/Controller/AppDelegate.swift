@@ -16,7 +16,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
 
     var window: UIWindow?
    
-    let realm = try! Realm()
+    //let realm = try! Realm()
    
     var mapViewController: MapViewController?
     var locationService: LocationService?

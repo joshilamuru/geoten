@@ -23,7 +23,10 @@
 		CB71DF1420E52E2800AEC106 /* FormsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB71DF1320E52E2800AEC106 /* FormsViewController.swift */; };
 		CB71DF1620E52E3900AEC106 /* CategoryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB71DF1520E52E3900AEC106 /* CategoryViewController.swift */; };
 		CB71DF1C20ECC2E500AEC106 /* LocationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CB71DF1B20ECC2E500AEC106 /* LocationService.swift */; };
+		CBAB32BA211825A200D3E9DA /* DynamicFormViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBAB32B9211825A200D3E9DA /* DynamicFormViewController.swift */; };
 		CBC84E0F20D17B83005D6A82 /* MapViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBC84E0E20D17B83005D6A82 /* MapViewController.swift */; };
+		CBE2AED72111792B00892F7E /* TaskType.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE2AED62111792B00892F7E /* TaskType.swift */; };
+		CBE2AED92111AC4A00892F7E /* CustomField.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBE2AED82111AC4A00892F7E /* CustomField.swift */; };
 		CBF70AE120DD12CC002E69D5 /* POI.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF70AE020DD12CC002E69D5 /* POI.swift */; };
 /* End PBXBuildFile section */
 
@@ -47,7 +50,10 @@
 		CB71DF1320E52E2800AEC106 /* FormsViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormsViewController.swift; sourceTree = "<group>"; };
 		CB71DF1520E52E3900AEC106 /* CategoryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CategoryViewController.swift; sourceTree = "<group>"; };
 		CB71DF1B20ECC2E500AEC106 /* LocationService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocationService.swift; sourceTree = "<group>"; };
+		CBAB32B9211825A200D3E9DA /* DynamicFormViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicFormViewController.swift; sourceTree = "<group>"; };
 		CBC84E0E20D17B83005D6A82 /* MapViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewController.swift; sourceTree = "<group>"; };
+		CBE2AED62111792B00892F7E /* TaskType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TaskType.swift; sourceTree = "<group>"; };
+		CBE2AED82111AC4A00892F7E /* CustomField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CustomField.swift; sourceTree = "<group>"; };
 		CBF70AE020DD12CC002E69D5 /* POI.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = POI.swift; sourceTree = "<group>"; };
 		D05F9909EEEEB78515C60752 /* Pods-sampleForGeo.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-sampleForGeo.debug.xcconfig"; path = "Pods/Target Support Files/Pods-sampleForGeo/Pods-sampleForGeo.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -119,6 +125,8 @@
 			isa = PBXGroup;
 			children = (
 				CBF70AE020DD12CC002E69D5 /* POI.swift */,
+				CBE2AED62111792B00892F7E /* TaskType.swift */,
+				CBE2AED82111AC4A00892F7E /* CustomField.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -133,6 +141,7 @@
 				CB1BDA7620DB6BF2001FB883 /* AddPlaceViewController.swift */,
 				CB31D71A20E27D6200677D73 /* CheckInController.swift */,
 				CB71DF1B20ECC2E500AEC106 /* LocationService.swift */,
+				CBAB32B9211825A200D3E9DA /* DynamicFormViewController.swift */,
 			);
 			path = Controller;
 			sourceTree = "<group>";
@@ -283,6 +292,8 @@
 				"${SRCROOT}/Pods/Target Support Files/Pods-sampleForGeo/Pods-sampleForGeo-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Alamofire/Alamofire.framework",
 				"${BUILT_PRODUCTS_DIR}/CryptoSwift/CryptoSwift.framework",
+				"${BUILT_PRODUCTS_DIR}/Eureka/Eureka.framework",
+				"${BUILT_PRODUCTS_DIR}/ImageRow/ImageRow.framework",
 				"${BUILT_PRODUCTS_DIR}/Realm/Realm.framework",
 				"${BUILT_PRODUCTS_DIR}/RealmSwift/RealmSwift.framework",
 				"${BUILT_PRODUCTS_DIR}/SVProgressHUD/SVProgressHUD.framework",
@@ -292,6 +303,8 @@
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Alamofire.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CryptoSwift.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Eureka.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ImageRow.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Realm.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/RealmSwift.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/SVProgressHUD.framework",
@@ -309,6 +322,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CBAB32BA211825A200D3E9DA /* DynamicFormViewController.swift in Sources */,
 				CB71DF1C20ECC2E500AEC106 /* LocationService.swift in Sources */,
 				CB1BDA7720DB6BF2001FB883 /* AddPlaceViewController.swift in Sources */,
 				CB69E1BD20D68DA300AF7430 /* LoginViewController.swift in Sources */,
@@ -316,9 +330,11 @@
 				CB5D7B2820D526B80042EE03 /* Constants.swift in Sources */,
 				CB71DF1220E52E1600AEC106 /* PicturesViewController.swift in Sources */,
 				CBF70AE120DD12CC002E69D5 /* POI.swift in Sources */,
+				CBE2AED72111792B00892F7E /* TaskType.swift in Sources */,
 				CB71DF1420E52E2800AEC106 /* FormsViewController.swift in Sources */,
 				CB55BF7C20D0E5DA0084375D /* AppDelegate.swift in Sources */,
 				CB55BF8420D0E5DB0084375D /* sampleForGeo.xcdatamodeld in Sources */,
+				CBE2AED92111AC4A00892F7E /* CustomField.swift in Sources */,
 				CBC84E0F20D17B83005D6A82 /* MapViewController.swift in Sources */,
 				CB71DF1620E52E3900AEC106 /* CategoryViewController.swift in Sources */,
 				CB71DF1020E52DFE00AEC106 /* CommentsViewController.swift in Sources */,

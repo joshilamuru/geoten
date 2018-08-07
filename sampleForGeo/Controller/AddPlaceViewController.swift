@@ -73,6 +73,7 @@ class AddPlaceViewController:
         else {
             
             let newPlace = POI()
+            newPlace.name = placeTextField.text!
             newPlace.address = placeTextField.text!
             newPlace.latitude = marker.position.latitude
             newPlace.longitude = marker.position.longitude
