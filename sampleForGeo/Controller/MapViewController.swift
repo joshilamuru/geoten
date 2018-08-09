@@ -38,7 +38,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
     @IBOutlet weak var pointOfInterestTableView: UITableView!
     @IBOutlet weak var mapView: GMSMapView!
 
-    @IBOutlet weak var chkInButton: UIButton!
+    @IBOutlet weak var detailButton: UIButton!
     
    // MARK: Declare variables
     let locationManager = CLLocationManager()
@@ -64,21 +64,14 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
        
         pointOfInterestTableView.delegate = self
         pointOfInterestTableView.dataSource = self
-        
-        
-
+       
         print("Current location obtained :  \(currentLocation.coordinate.latitude, currentLocation.coordinate.longitude)")
        
-            
         //loadPOI()
         //initMap()
         
         //mapView.delegate = self
-        
-        //setting up notification
-       
-        
-        
+     
         //Initializing searchResultsController to nil meaning searchController will use this view controller
         //to display the results
         searchController = UISearchController(searchResultsController: nil)
@@ -111,6 +104,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
         locationManager.desiredAccuracy = kCLLocationAccuracyHundredMeters
         locationManager.requestWhenInUseAuthorization()
         locationManager.startUpdatingLocation()
+       // locationManager.startMonitoringSignificantLocationChanges()
     }
     func initMap() {
         let camera = GMSCameraPosition.camera(withLatitude: (currentLocation.coordinate.latitude),longitude: (currentLocation.coordinate.longitude), zoom: 16)
@@ -126,7 +120,7 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
         let savedPlaces = Array(realm.objects(POI.self))
         nearHundred.removeAll()
         for place in savedPlaces {
-            if(calcDistanceFromUser(place: place) >= 100.0) {
+            if(calcDistanceFromUser(place: place) >= 10.0) {
                 let nearHundredPlace = PointOfInterest(address: place.name, latitude: place.latitude, longitude: place.longitude, taskTypeID: place.TasktypeID )
                 nearHundred.append(nearHundredPlace)
                 
@@ -226,19 +220,18 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
         //locationDetailLabel.text = "Location Unavailable"
     }
 
-  
-    @IBAction func chkInBtnPressed(_ sender: Any) {
-      
+    @IBAction func detailBtnPressed(_ sender: Any) {
         if(selectedIndex != nil) {
-            performSegue(withIdentifier: "formSegue", sender: self)
+            performSegue(withIdentifier: "detailSegue", sender: self)
         }else{
-              //alert user if no selection made
+            //alert user if no selection made
             let alert = UIAlertController(title: "Alert", message: "Please select a place before continuing.", preferredStyle: .alert)
             
             alert.addAction(UIAlertAction(title: "Ok", style: .default, handler: nil))
             self.present(alert, animated: true)
         }
     }
+    
     
 }
 

@@ -13,7 +13,16 @@ import SwiftyJSON
 import SVProgressHUD
 import RealmSwift
 
+struct KeychainConfiguration {
+    static let serviceName = "TouchMeIn"
+    static let accessGroup: String? = nil
+}
+
 class LoginViewController: UIViewController, UITextFieldDelegate {
+    var passwordItems: [KeychainPasswordItem] = []
+    let createLoginButtonTag = 0
+    let loginButtonTag = 1
+
     @IBOutlet weak var userTextfield: UITextField!
     @IBOutlet weak var passwordTextfield: UITextField!
     
@@ -76,11 +85,26 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
        
         if((validate(userTextfield).0) && (validate(passwordTextfield).0)){
             print("both are valid")
+            
+            
             SVProgressHUD.show()
             encryptedPassword = passwordTextfield.text!.md5()
             authenticateUser(username: userTextfield.text!, password: encryptedPassword) {
             (response) in
                 if(self.authenticated){
+                    //store in keychain
+                     UserDefaults.standard.setValue(self.userTextfield.text, forKey: "username")
+                    do {
+                        
+                        let passwordItem = KeychainPasswordItem(service: KeychainConfiguration.serviceName,
+                                                                account: self.userTextfield.text!,
+                                                                accessGroup: KeychainConfiguration.accessGroup)
+                        
+                        // Save the password for the user
+                        try passwordItem.savePassword(self.encryptedPassword)
+                    } catch {
+                        fatalError("Error updating keychain - \(error)")
+                    }
                     //get the tasktypes and accounts from server
                       self.loadTaskTypefromServer(username: self.userTextfield.text!, password: self.encryptedPassword)
                     self.loadPOIfromServer(username: self.userTextfield.text!, password: self.encryptedPassword)
@@ -250,8 +274,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     func authenticateUser(username: String, password: String, completion: @escaping (Bool) -> Void) {
         
         
-        //let url = Constants.Domains.Stag + Constants.authUserMethod
-        let url = "http://49.207.180.189:8082/taskease/authenticationUser.htm"
+        let url = Constants.Domains.Stag + Constants.authUserMethod
+        //let url = "http://49.207.180.189:8082/taskease/authenticationUser.htm"
         //+ Constants.authUserMethod
         //{"eMail":"user2@taskease.com","password":"21232f297a57a5a743894a0e4a801fc3","mobileIMEINumber":"911430509678238","deviceID":"APA91bGIWYSx_ufY3fMVu0z1jk4U_LVvh-FdFhDJUrlZA0igkpJH0sJ-k9tRv11N24T9_-ccADRAKMCOldHKDdaIOD1WucuCX_AL9s_6_8-7PKMzDeSdo8MQql0EQDUnsMZ7E6TPlvfXZCrplk4U9DFL2oH2OyJEkw","mobileInfo":"VERSION.RELEASE-6.0,MODEL-Android SDK built for x86,TASKEASE_VERSION_NAME-Revamp 2.51.67","osType":"ANDROID"}
         
