@@ -17,7 +17,7 @@ class TaskType: Object {
     @objc dynamic var TypeName : String = ""
     @objc dynamic var JobTypeID : Int = 0
     @objc dynamic var JobType : String = ""
-    
+     @objc dynamic var synced : Bool = false
     
     
     override static func primaryKey() -> String? {

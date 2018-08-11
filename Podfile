@@ -15,5 +15,5 @@ pod 'RealmSwift'
 pod 'SVProgressHUD'
 pod 'Eureka'
 pod 'ImageRow'
-
+pod 'ReachabilitySwift'
 end

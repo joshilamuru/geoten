@@ -33,7 +33,7 @@ class PointOfInterest: NSObject {
     }
 }
 
-class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchResultsUpdating {
+class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchResultsUpdating, LocationUpdateProtocol {
    
     @IBOutlet weak var pointOfInterestTableView: UITableView!
     @IBOutlet weak var mapView: GMSMapView!
@@ -50,25 +50,26 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
     var selectedPlace : GMSPlace?
     var searchController: UISearchController!
     let realm = try! Realm()
-    var locationService: LocationService?
+    var mapInitialized: Bool = false
+    
     
    
     override func viewDidLoad() {
         
         super.viewDidLoad()
-        initLocationManager()
-       //  locationService = LocationService()
-      //   locationService.initLocationManager()
-//      NotificationCenter.default.addObserver(self, selector: #selector(MapViewController.updateCurrentLocation), name: Notification.Name.currentLoc, object: nil)
-//
-       
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(MapViewController.locationUpdateNotification(_:)), name: NSNotification.Name(rawValue: kLocationDidChangeNotification), object: nil)
+        let LocationMgr = LocationService.SharedManager
+        LocationMgr.delegate = self
+        //initLocationManager()
+     
         pointOfInterestTableView.delegate = self
         pointOfInterestTableView.dataSource = self
        
         print("Current location obtained :  \(currentLocation.coordinate.latitude, currentLocation.coordinate.longitude)")
        
-        //loadPOI()
-        //initMap()
+       // loadPOI()
+       // initMap()
         
         //mapView.delegate = self
      
@@ -89,14 +90,24 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
         //self.extendedLayoutIncludesOpaqueBars = true
     }
     
-    @objc func updateCurrentLocation(notification: Notification) {
-        print("entered updateCurrentLocation")
-       
-        currentLocation = notification.userInfo?["value"] as! CLLocation
+    @objc func locationUpdateNotification(_ notification: Notification) {
+        let userinfo = notification.userInfo
+        self.currentLocation = userinfo!["location"] as! CLLocation
+        print("Latitude : \(self.currentLocation.coordinate.latitude)")
+        print("Longitude : \(self.currentLocation.coordinate.longitude)")
+        loadPOI()
+        
+        initMap()
+        
     }
     
+    func locationDidUpdateToLocation(location: CLLocation) {
+        currentLocation = location
+        print(currentLocation)
+        //  initMap()
+    }
     override func viewWillDisappear(_ animated: Bool) {
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: "currentLoc"), object: nil)
+        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kLocationDidChangeNotification), object: nil)
     }
     func initLocationManager() {
         //Setup location manager
@@ -107,14 +118,17 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
        // locationManager.startMonitoringSignificantLocationChanges()
     }
     func initMap() {
-        let camera = GMSCameraPosition.camera(withLatitude: (currentLocation.coordinate.latitude),longitude: (currentLocation.coordinate.longitude), zoom: 16)
-        mapView.camera = camera
-        mapView.isMyLocationEnabled = true
-        mapView.settings.myLocationButton = true
-        let gmsCircle = GMSCircle(position: (currentLocation.coordinate), radius: 100)
-        let update = GMSCameraUpdate.fit(gmsCircle.bounds())
-        mapView.animate(with: update)
+        
+            let camera = GMSCameraPosition.camera(withLatitude: (currentLocation.coordinate.latitude),longitude: (currentLocation.coordinate.longitude), zoom: 16)
+            mapView.camera = camera
+            mapView.isMyLocationEnabled = true
+            mapView.settings.myLocationButton = true
+            let gmsCircle = GMSCircle(position: (currentLocation.coordinate), radius: 100)
+            let update = GMSCameraUpdate.fit(gmsCircle.bounds())
+            mapView.animate(with: update)
+        
     }
+    
     func loadPOI(){
         
         let savedPlaces = Array(realm.objects(POI.self))
@@ -167,14 +181,15 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
             
             navigationItem.title = " "
             destinationVC.navigationItem.title = "Add A New Place"
-        }else if (segue.identifier == "formSegue") {
-            let destinationVC = segue.destination as! DynamicFormViewController
+        }else if (segue.identifier == "detailSegue") {
+            let destinationVC = segue.destination as! AcctDetailsViewController
             navigationItem.title = ""
-          
+            destinationVC.navigationItem.title = "Account Details"
             if(selectedIndex != nil){
-            destinationVC.acct = filteredNearHundred[selectedIndex].address
-            destinationVC.taskTypeID = filteredNearHundred[selectedIndex].taskTypeID
-                //print(filteredNearHundred[selectedIndex])
+                destinationVC.acctLocation = CLLocation(latitude: filteredNearHundred[selectedIndex].latitude, longitude: filteredNearHundred[selectedIndex].longitude)
+                
+               destinationVC.poi = filteredNearHundred[selectedIndex]
+                    //print(filteredNearHundred[selectedIndex])
             }else
             {
                 print("no row selected in tableview")
@@ -190,35 +205,8 @@ class MapViewController: UIViewController, CLLocationManagerDelegate, UISearchRe
         // Dispose of any resources that can be recreated.
     }
    
-    //didUpdateLocations method
-    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        
-        currentLocation = locations[locations.count-1] //getting the last updated location which is most accurate
-        if currentLocation.horizontalAccuracy > 0 {
-            locationManager.stopUpdatingLocation()
-          //  let data : [String: CLLocation] = ["value" : currentLocation]
-            NotificationCenter.default.post(name: NSNotification.Name(rawValue: "currentLoc"), object: nil, userInfo: ["value": currentLocation])
-            loadPOI()
-        
-            print("longitude = \(currentLocation.coordinate.longitude), latitude = \(currentLocation.coordinate.latitude)")
-            
-            let camera = GMSCameraPosition.camera(withLatitude: currentLocation.coordinate.latitude,longitude: currentLocation.coordinate.longitude, zoom: 16)
-            mapView.camera = camera
-            mapView.isMyLocationEnabled = true
-            mapView.settings.myLocationButton = true
-            let gmsCircle = GMSCircle(position: currentLocation.coordinate, radius: 100)
-            let update = GMSCameraUpdate.fit(gmsCircle.bounds())
-            mapView.animate(with: update)
-           
-            
-            
-        }
-    }
-    //didFailWithError method
-    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        print(error)
-        //locationDetailLabel.text = "Location Unavailable"
-    }
+  
+   
 
     @IBAction func detailBtnPressed(_ sender: Any) {
         if(selectedIndex != nil) {

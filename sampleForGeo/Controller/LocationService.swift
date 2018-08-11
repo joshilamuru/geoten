@@ -61,7 +61,8 @@ class LocationService : NSObject, CLLocationManagerDelegate {
             print(error)
             
         }
-        
+    
+    
         
     
 }

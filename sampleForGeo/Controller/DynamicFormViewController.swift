@@ -94,9 +94,14 @@ class DynamicFormViewController: FormViewController {
             }
            
             }
-        for section in form.allSections {
-            print("Section tags - \(section.tag)")
-        }
+//        for section in form.allSections {
+//            print("Section tags - \(section.tag)")
+//        }
+            self.form.last! <<< ButtonRow("Save") {
+                $0.title = "Save"
+                }.cellUpdate { cell, row in
+                cell.textLabel?.textColor = UIColor.orange
+                cell.backgroundColor = UIColor.darkGray }
         }
     
 

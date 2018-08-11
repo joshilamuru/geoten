@@ -82,7 +82,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
     }
     
     @IBAction func logInPressed(_ sender: Any) {
-       
+      
         if((validate(userTextfield).0) && (validate(passwordTextfield).0)){
             print("both are valid")
             
@@ -188,6 +188,7 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                 else {
                     print("Error \(response.result.error)")
                     
+                    SVProgressHUD.dismiss()
                     
                 }
                 
@@ -252,6 +253,8 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
                     newPlace.address = json["accountRead"][i]["taskAddress"].stringValue
                     newPlace.latitude = json["accountRead"][i]["taskLat"].doubleValue
                     newPlace.longitude = json["accountRead"][i]["taskLng"].doubleValue
+                    newPlace.createdDate = json["accountRead"][i]["createdDate"].stringValue
+                    newPlace.synced = true
                     realm.add(newPlace, update: true)
                   
                   //  print("Successful in getting account \(i) from server")
@@ -390,6 +393,9 @@ class LoginViewController: UIViewController, UITextFieldDelegate {
         let emailTest = NSPredicate(format:"SELF MATCHES[c] %@", emailRegEx)
         return emailTest.evaluate(with: emailField)
     }
+    
+    
+  
 }
 
 

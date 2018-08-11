@@ -78,10 +78,11 @@ class AddPlaceViewController:
             newPlace.address = placeTextField.text!
             newPlace.latitude = marker.position.latitude
             newPlace.longitude = marker.position.longitude
+            newPlace.synced = false
             do{
                 try realm.write{
                     realm.add(newPlace)
-                    syncPOItoServer(place: newPlace)
+                //    syncPOItoServer(place: newPlace)
                     _ = navigationController?.popViewController(animated: true)
                 }
             }catch{
@@ -113,7 +114,7 @@ class AddPlaceViewController:
         
         let values = [
                         "accounts":[
-                                    "taskIDFrmMobile": place.accountID,
+                                    "accountIDFrmMobile": place.accountID,
                                     "accountID": "0",                                                                          
                                     "accountName": place.name,
                                     "taskDescription": place.name,

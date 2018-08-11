@@ -11,52 +11,65 @@ import CoreLocation
 import GoogleMaps
 import GooglePlaces
 
-class AcctDetailsViewController: UIViewController, LocationUpdateProtocol  {
+class AcctDetailsViewController: UIViewController  {
 
-    
+    var poi : PointOfInterest!
     @IBOutlet weak var mapView: GMSMapView!
-    var currentLocation = CLLocation()
+    var acctLocation = CLLocation()
     
     override func viewDidLoad() {
         super.viewDidLoad()
-         NotificationCenter.default.addObserver(self, selector: #selector(AcctDetailsViewController.locationUpdateNotification(_:)), name: NSNotification.Name(rawValue: kLocationDidChangeNotification), object: nil)
-        let LocationMgr = LocationService.SharedManager
-        LocationMgr.delegate = self
-        print("CurrentLocation obtained \(currentLocation)")
+        initMap()
         
         // Do any additional setup after loading the view.
     }
 
     func initMap() {
-        let camera = GMSCameraPosition.camera(withLatitude: (currentLocation.coordinate.latitude),longitude: (currentLocation.coordinate.longitude), zoom: 16)
+        let camera = GMSCameraPosition.camera(withLatitude: (acctLocation.coordinate.latitude),longitude: (acctLocation.coordinate.longitude), zoom: 25)
         mapView.camera = camera
         mapView.isMyLocationEnabled = true
         mapView.settings.myLocationButton = true
-        let gmsCircle = GMSCircle(position: (currentLocation.coordinate), radius: 100)
-        let update = GMSCameraUpdate.fit(gmsCircle.bounds())
-        mapView.animate(with: update)
+        
+        let marker = GMSMarker()
+        marker.position = CLLocationCoordinate2D(latitude: (acctLocation.coordinate.latitude) , longitude: (acctLocation.coordinate.longitude))
+        marker.map = mapView
+        self.mapView.animate(toLocation: marker.position)
+        
+        
     }
     
+    @IBAction func ChkInPressed(_ sender: Any) {
+        performSegue(withIdentifier: "formSegue", sender: self)
+    }
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        if(segue.identifier == "formSegue") {
+            let destinationVC = segue.destination as! DynamicFormViewController
+            destinationVC.acct = poi.address
+            destinationVC.taskTypeID = poi.taskTypeID
+            
+            navigationItem.title = " "
+            destinationVC.navigationItem.title = "Form Details"
+        }
+    }
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
 
-    @objc func locationUpdateNotification(_ notification: Notification) {
-        let userinfo = notification.userInfo
-        self.currentLocation = userinfo!["location"] as! CLLocation
-        print("Latitude : \(self.currentLocation.coordinate.latitude)")
-        print("Longitude : \(self.currentLocation.coordinate.longitude)")
-        initMap()
-    }
-
-    func locationDidUpdateToLocation(location: CLLocation) {
-        currentLocation = location
-        print(currentLocation)
-      //  initMap()
-    }
-    override func viewWillDisappear(_ animated: Bool) {
-        NotificationCenter.default.removeObserver(self, name: NSNotification.Name(rawValue: kLocationDidChangeNotification), object: nil)
-    }
+  
+   
 }
+
+//extension AcctDetailsViewController: UITableViewDelegate, UITableViewDataSource{
+//    
+//    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+//        
+//    }
+//    
+//    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+//        
+//    }
+//    
+//    
+//}

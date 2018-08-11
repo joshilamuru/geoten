@@ -16,15 +16,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
 
     var window: UIWindow?
    
-    //let realm = try! Realm()
+  //  let realm = try! Realm()
    
-    var mapViewController: MapViewController?
     var locationService: LocationService?
-    
+ 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplicationLaunchOptionsKey: Any]?) -> Bool {
+     
         
-      
-      
         UIApplication.shared.statusBarStyle = UIStatusBarStyle.lightContent
        // UINavigationBar.appearance().tintColor = UIColor.orange
         UINavigationBar.appearance().backgroundColor = UIColor.orange
@@ -51,10 +49,13 @@ class AppDelegate: UIResponder, UIApplicationDelegate, CLLocationManagerDelegate
 
     func applicationWillEnterForeground(_ application: UIApplication) {
         // Called as part of the transition from the background to the active state; here you can undo many of the changes made on entering the background.
+        NetworkManager.sharedInstance.stopMonitoring()
     }
 
     func applicationDidBecomeActive(_ application: UIApplication) {
         // Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
+        
+       NetworkManager.sharedInstance.startMonitoring()
     }
 
     func applicationWillTerminate(_ application: UIApplication) {
